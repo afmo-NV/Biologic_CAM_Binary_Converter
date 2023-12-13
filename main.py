@@ -30,8 +30,10 @@ except Exception as e:
     raise
 
 # Open a tkinter interface to get the path of all the files
-#mpr_file_path_unfiltered = get_file_path(base_directory)
-mpr_file_path_unfiltered = get_file_path('/Users/andresmolina/Documents/')
+try:
+    mpr_file_path_unfiltered = get_file_path('/XXXX/xxxxxxx')
+except Exception as e:
+    logging.error(f"MAIN. An error has ocurred trying to open the file selector interface. Go to main.py line 34 and make sure the path is correct")
 
 # Filter to remove all files with OCV in the name
 mpr_file_path = filter_OCV_files(mpr_file_path_unfiltered)
