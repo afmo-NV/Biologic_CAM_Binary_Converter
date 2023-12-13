@@ -6,8 +6,8 @@ import warnings
 import logging
 import yaml
 
-# Get the base directory
-base_directory = '/Users/andresmolina/Documents/Python_Projects/08_CAM_Biologic_Binary_Converter'
+# Define the path to the base directory where the python files are.
+base_directory = '/XXXXX/xxxxxxx'
 
 # Load logger configuration
 configure_logging(base_directory)
@@ -33,7 +33,7 @@ except Exception as e:
 #mpr_file_path_unfiltered = get_file_path(base_directory)
 mpr_file_path_unfiltered = get_file_path('/Users/andresmolina/Documents/')
 
-# Filter to filter out all files with OCV in the name
+# Filter to remove all files with OCV in the name
 mpr_file_path = filter_OCV_files(mpr_file_path_unfiltered)
 
 # Ensure mpr_file_path is always a list
@@ -109,8 +109,6 @@ except Exception as e:
 # Export all data for cycle life experiments ###########################################################################
 ########################################################################################################################
 # Add sample IDs to cycle_life_sample_data DataFrame
-
-
 cycle_life_sample_data['Sample IDs'] = sample_ID_list
 
 if not cycle_life_sample_data.empty:
