@@ -1,0 +1,8 @@
+#
+# Config -----------------------------------------------------------------------
+#
+
+# Path where the data will be exported 'path_export_folder'
+# This path is used by MAIN
+
+path_export_folder: '/xxxxx/xxxxxxx....'
