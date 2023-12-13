@@ -46,51 +46,55 @@ cycle_life_sample_data = pd.DataFrame()
 sample_ID_list = []
 
 for path in mpr_file_path:
+    try:
+        # Extract filename from path
+        filename = (Path(path)).stem
+    
+        logging.debug(f"MAIN. Starting data extraction for filename {filename}")
+    
+        # Convert to cloud data format
+        cloud_data_df = convert_file_to_cloud(path)
+    
+        # Extract sample ID from filename
+        sample_ID = process_filenames_CC(filename)
+    
+        if sample_ID == None:
+            logging.debug(f"MAIN. Sample ID not found in {filename}. Extracting from filename")
+            pattern = (re.compile(r'(.*?)-CC'))
+            sample_ID = (pattern.findall(filename))[0]
+            logging.debug(f"MAIN. Sample ID ID extracted as  {sample_ID}.")
+    
+        # Extract mass from filename
+        mass = extract_mass_from_filename(filename)
+    
+        # Extract protocol type from filename
+        protocol_type = get_protocol_type(filename)
+    
+        if protocol_type in ['F', 'FC']:
+    
+            features_dict = extract_formation_features(filename, cloud_data_df, mass)
+            qc_cc_summary = create_dataframe(features_dict)
+            qc_sample_summary = qc_sample_summary._append(qc_cc_summary)
+    
+        elif protocol_type == 'CL':
+    
+            # Features extraction of selected cycles
+            features_qc_dict = extract_qc_cycle_life_features(filename, cloud_data_df, mass)
+            qc_cc_summary = create_dataframe(features_qc_dict)
+            qc_sample_summary = qc_sample_summary._append(qc_cc_summary)
+    
+            # Features extraction of all cycles
+            features_dict = extract_all_cycle_life_features(filename, cloud_data_df, mass)
+            cycle_life_data_cc_data = create_dataframe(features_dict)
+            cycle_life_sample_data = cycle_life_sample_data._append(cycle_life_data_cc_data)
+    
+        logging.debug(f"MAIN. Data extraction for {filename} finished")
 
-    # Extract filename from path
-    filename = (Path(path)).stem
-
-    logging.debug(f"MAIN. Starting data extraction for filename {filename}")
-
-    # Convert to cloud data format
-    cloud_data_df = convert_file_to_cloud(path)
-
-    # Extract sample ID from filename
-    sample_ID = process_filenames_CC(filename)
-
-    if sample_ID == None:
-        logging.debug(f"MAIN. Sample ID not found in {filename}. Extracting from filename")
-        pattern = (re.compile(r'(.*?)-CC'))
-        sample_ID = (pattern.findall(filename))[0]
-        logging.debug(f"MAIN. Sample ID ID extracted as  {sample_ID}.")
-
-    sample_ID_list.append(sample_ID)
-
-    # Extract mass from filename
-    mass = extract_mass_from_filename(filename)
-
-    # Extract protocol type from filename
-    protocol_type = get_protocol_type(filename)
-
-    if protocol_type in ['F', 'FC']:
-
-        features_dict = extract_formation_features(filename, cloud_data_df, mass)
-        qc_cc_summary = create_dataframe(features_dict)
-        qc_sample_summary = qc_sample_summary._append(qc_cc_summary)
-
-    elif protocol_type == 'CL':
-
-        # Features extraction of selected cycles
-        features_qc_dict = extract_qc_cycle_life_features(filename, cloud_data_df, mass)
-        qc_cc_summary = create_dataframe(features_qc_dict)
-        qc_sample_summary = qc_sample_summary._append(qc_cc_summary)
-
-        # Features extraction of all cycles
-        features_dict = extract_all_cycle_life_features(filename, cloud_data_df, mass)
-        cycle_life_data_cc_data = create_dataframe(features_dict)
-        cycle_life_sample_data = cycle_life_sample_data._append(cycle_life_data_cc_data)
-
-    logging.debug(f"MAIN. Data extraction for {filename} finished")
+        # Append sample ID name of files that were correctly processed
+        sample_ID_list.append(sample_ID)
+    except Exception as e:
+        logging.error(f"MAIN. Error processing file {filename}: {e}")
+        continue # In case of error, skip to the next file
 
 
 ########################################################################################################################
